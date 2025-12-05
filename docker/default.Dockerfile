@@ -51,6 +51,8 @@ RUN wget https://www.sqlite.org/${SQLITE_RELEASE_YEAR}/sqlite-amalgamation-${SQL
 
 FROM python:3.13.7-slim-trixie AS linkding
 LABEL org.opencontainers.image.source="https://github.com/sissbruecker/linkding"
+# Avoid encoding issues related to file writing
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 # install runtime dependencies
 RUN apt-get update && apt-get -y install media-types libpq-dev libicu-dev libssl3t64 curl
 WORKDIR /etc/linkding
