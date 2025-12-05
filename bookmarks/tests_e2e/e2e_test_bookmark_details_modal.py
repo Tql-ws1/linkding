@@ -178,3 +178,36 @@ class BookmarkDetailsModalE2ETestCase(LinkdingE2ETestCase):
             # Snapshot is removed
             expect(snapshot).not_to_be_visible()
             self.assertReloads(0)
+
+    def test_upload_html_snapshot_whose_name_contains_unicode_characters(self):
+        bookmark = self.setup_bookmark()
+
+        with sync_playwright() as p:
+            url = reverse("linkding:bookmarks.index") + f"?q={bookmark.title}"
+            page = self.open(url, p)
+
+            details_modal = self.open_details_modal(bookmark)
+            asset_list = details_modal.locator(".assets")
+
+            # No snapshots initially
+            snapshot = asset_list.get_by_text("👾.html", exact=False)
+            expect(snapshot).not_to_be_visible()
+
+            # Upload html snapshot
+            with page.expect_file_chooser() as fc_info:
+                details_modal.locator("#upload-asset").click()
+
+            file_chooser = fc_info.value
+            file_chooser.set_files(
+                files=[
+                    {
+                        "name": "👾.html",
+                        "mimeType": "text/plain",
+                        "buffer": b"",
+                    }
+                ],
+            )
+            self.assertReloads(0)
+
+            # Snapshot upload successful
+            expect(snapshot).to_be_visible()
