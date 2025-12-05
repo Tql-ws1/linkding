@@ -5,6 +5,11 @@ on:
   push:
     branches:
       - master
+      - CI
+
+env:
+  LANG: C.UTF-8
+  LC_ALL: C.UTF-8
 
 jobs:
   unit_tests:
